@@ -1,4 +1,22 @@
-# Starter Next/Hardhat Project
+# ETH ATM
+
+This is a simple React component for a ETH ATM application. It allows users to connect their MetaMask wallet, view their account balance, deposit custom and withdraw custom ETH.
+
+## Features
+
+The ETH ATM component provides the following features:
+
+- Connect to MetaMask wallet
+- Display user's account address
+- View user's account balance
+- Deposit custom ETH into the ATM
+- Withdraw  custom ETH from the ATM
+
+
+Please note that the component assumes you have set up and configured MetaMask in your browser.
+
+
+## Setup
 
 After cloning the github, you will want to do the following to get the code running on your computer.
 
