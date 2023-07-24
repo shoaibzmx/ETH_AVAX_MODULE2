@@ -1,19 +1,19 @@
-# ETH ATM
+# ETH ATM and Crypto investment calculator.
 
-This is a simple React component for a ETH ATM application. It allows users to connect their MetaMask wallet, view their account balance, deposit custom and withdraw custom ETH.
+This is a simple React component for a ETH ATM application. It allows users to connect their MetaMask wallet, view their account balance, deposit custom and withdraw custom ETH.Additionally, users can use the crypto investment calculator to estimate the potential value of their investment over a specified duration.
 
 ## Features
 
 The ETH ATM component provides the following features:
 
-- Connect to MetaMask wallet
-- Display user's account address
-- View user's account balance
-- Deposit custom ETH into the ATM
-- Withdraw  custom ETH from the ATM
-
-
-Please note that the component assumes you have set up and configured MetaMask in your browser.
+- Connect your MetaMask wallet by clicking the "Connect" button.
+- Deposit funds by entering the desired amount in ETH and clicking the "Deposit" button.
+- Withdraw funds by entering the withdrawal amount and clicking the "Withdraw" button.
+- Use the crypto investment calculator to estimate the potential investment value:
+- Enter the principal amount (in ETH) you wish to invest.
+- Set the annual interest rate (in percentage).
+- Specify the investment duration (in years).
+- Click the "Calculate Investment" button to see the estimated value after the specified duration.
 
 
 ## Setup
