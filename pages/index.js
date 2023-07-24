@@ -10,6 +10,12 @@ export default function HomePage() {
   const [depositAmount, setDepositAmount] = useState(0);
   const [withdrawAmount, setWithdrawAmount] = useState(0);
 
+  // New state variables for investment calculator
+  const [principalAmount, setPrincipalAmount] = useState(0);
+  const [annualInterestRate, setAnnualInterestRate] = useState(0);
+  const [investmentDuration, setInvestmentDuration] = useState(0);
+  const [investmentValue, setInvestmentValue] = useState(undefined);
+
   const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   const atmABI = atm_abi.abi;
 
@@ -19,15 +25,15 @@ export default function HomePage() {
     }
 
     if (ethWallet) {
-      const account = await ethWallet.request({ method: "eth_accounts" });
-      handleAccount(account);
+      const accounts = await ethWallet.request({ method: "eth_accounts" });
+      handleAccount(accounts);
     }
   };
 
-  const handleAccount = (account) => {
-    if (account) {
-      console.log("Account connected: ", account);
-      setAccount(account);
+  const handleAccount = (accounts) => {
+    if (accounts.length > 0) {
+      console.log("Account connected: ", accounts[0]);
+      setAccount(accounts[0]);
     } else {
       console.log("No account found");
     }
@@ -39,11 +45,13 @@ export default function HomePage() {
       return;
     }
 
-    const accounts = await ethWallet.request({ method: "eth_requestAccounts" });
-    handleAccount(accounts);
-
-    // once wallet is set we can get a reference to our deployed contract
-    getATMContract();
+    try {
+      const accounts = await ethWallet.request({ method: "eth_requestAccounts" });
+      handleAccount(accounts);
+      getATMContract();
+    } catch (error) {
+      console.error("Error connecting to MetaMask:", error);
+    }
   };
 
   const getATMContract = () => {
@@ -56,42 +64,69 @@ export default function HomePage() {
 
   const getBalance = async () => {
     if (atm) {
-      setBalance((await atm.getBalance()).toNumber());
+      try {
+        const currentBalance = await atm.getBalance();
+        setBalance(currentBalance.toNumber());
+      } catch (error) {
+        console.error("Error fetching balance:", error);
+      }
     }
   };
 
   const deposit = async () => {
     if (atm) {
-      let tx = await atm.deposit(depositAmount);
-      await tx.wait();
-      getBalance();
+      try {
+        const tx = await atm.deposit(depositAmount, { value: depositAmount });
+        await tx.wait();
+        getBalance();
+      } catch (error) {
+        console.error("Error depositing:", error);
+      }
     }
   };
 
   const withdraw = async () => {
     if (atm) {
-      let tx = await atm.withdraw(withdrawAmount);
-      await tx.wait();
-      getBalance();
+      try {
+        const tx = await atm.withdraw(withdrawAmount);
+        await tx.wait();
+        getBalance();
+      } catch (error) {
+        console.error("Error withdrawing:", error);
+      }
+    }
+  };
+
+  const calculateInvestmentValue = async () => {
+    if (atm) {
+      try {
+        const investmentValue = await atm.calculateCryptoInvestment(
+          ethers.utils.parseEther(principalAmount.toString()), // Convert to Wei
+          annualInterestRate,
+          investmentDuration
+        );
+
+        setInvestmentValue(ethers.utils.formatEther(investmentValue)); // Convert to ETH
+      } catch (error) {
+        console.error("Error calculating investment:", error);
+      }
     }
   };
 
   const initUser = () => {
-    // Check to see if user has Metamask
     if (!ethWallet) {
-      return <p>Please install Metamask in order to use this ATM.</p>;
+      return <p>Please install MetaMask in order to use this ATM.</p>;
     }
 
-    // Check to see if user is connected. If not, connect to their account
     if (!account) {
       return (
         <button onClick={connectAccount}>
-          Please connect your Metamask wallet
+          Please connect your MetaMask wallet
         </button>
       );
     }
 
-    if (balance == undefined) {
+    if (balance === undefined) {
       getBalance();
     }
 
@@ -111,6 +146,48 @@ export default function HomePage() {
           onChange={(e) => setWithdrawAmount(e.target.value)}
         />
         <button onClick={withdraw}>Withdraw</button>
+
+        {/* Investment Calculator */}
+        <div>
+          <h2>Crypto Investment Calculator</h2>
+          <div>
+            <label>Principal Amount (ETH): </label>
+            <input
+              type="number"
+              value={principalAmount}
+              onChange={(e) => setPrincipalAmount(e.target.value)}
+            />
+          </div>
+          <div>
+            <label>Annual Interest Rate (%): </label>
+            <input
+              type="number"
+              value={annualInterestRate}
+              onChange={(e) => setAnnualInterestRate(e.target.value)}
+            />
+          </div>
+          <div>
+            <label>Investment Duration (Years): </label>
+            <input
+              type="number"
+              value={investmentDuration}
+              onChange={(e) => setInvestmentDuration(e.target.value)}
+            />
+          </div>
+          <div>
+            <button onClick={calculateInvestmentValue}>
+              Calculate Investment
+            </button>
+          </div>
+          {investmentValue !== undefined && (
+            <div>
+              <p>
+                Investment Value after {investmentDuration} years:{" "}
+                {investmentValue} ETH
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
