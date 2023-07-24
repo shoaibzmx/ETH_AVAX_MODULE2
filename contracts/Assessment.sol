@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-//import "hardhat/console.sol";
-
 contract Assessment {
     address payable public owner;
     uint256 public balance;
@@ -15,12 +13,12 @@ contract Assessment {
         balance = initBalance;
     }
 
-    function getBalance() public view returns(uint256){
+    function getBalance() public view returns (uint256) {
         return balance;
     }
 
     function deposit(uint256 _amount) public payable {
-        uint _previousBalance = balance;
+        uint256 _previousBalance = balance;
 
         // make sure this is the owner
         require(msg.sender == owner, "You are not the owner of this account");
@@ -40,12 +38,9 @@ contract Assessment {
 
     function withdraw(uint256 _withdrawAmount) public {
         require(msg.sender == owner, "You are not the owner of this account");
-        uint _previousBalance = balance;
+        uint256 _previousBalance = balance;
         if (balance < _withdrawAmount) {
-            revert InsufficientBalance({
-                balance: balance,
-                withdrawAmount: _withdrawAmount
-            });
+            revert InsufficientBalance({ balance: balance, withdrawAmount: _withdrawAmount });
         }
 
         // withdraw the given amount
@@ -56,5 +51,17 @@ contract Assessment {
 
         // emit the event
         emit Withdraw(_withdrawAmount);
+    }
+
+    // Crypto Investment Calculator with Compound Interest
+    function calculateCryptoInvestment(uint256 principalAmount, uint256 annualInterestRate, uint256 investmentDuration) public pure returns (uint256) {
+        // Calculate investment value after the specified duration with compound interest
+        uint256 investmentValue = principalAmount;
+
+        for (uint256 i = 0; i < investmentDuration; i++) {
+            investmentValue += investmentValue * annualInterestRate / 100;
+        }
+
+        return investmentValue;
     }
 }
